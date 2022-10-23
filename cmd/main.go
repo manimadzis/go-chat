@@ -23,6 +23,7 @@ func main() {
 	if err != nil {
 		logger.Panicf("Cannot connect to DB")
 	}
+	defer dbConn.Close()
 
 	gormDB, err := gormclient.New(dbConn)
 	if err != nil {

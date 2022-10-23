@@ -28,7 +28,7 @@ type Chat struct {
 type Message struct {
 	ID     uint      `db:"id" json:"id,omitempty" gorm:"primaryKey"`
 	Text   string    `db:"text" json:"text,omitempty" gorm:"not null"`
-	Time   time.Time `db:"timestamp" json:"timestamp,omitempty" gorm:"default:CURRENT_TIMESTAMP"`
+	Time   time.Time `db:"timestamp" json:"timestamp,omitempty"`
 	ChatID uint      `db:"chat_id" json:"chat_id"`
 	UserID uint      `db:"user_id" json:"author_id,omitempty"`
 
