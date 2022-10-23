@@ -14,15 +14,16 @@ type User struct {
 	PasswordHash string `db:"password_hash" json:"-"`
 	IsDeleted    bool   `db:"is_deleted" json:"-"`
 
-	Chats []Chat `gorm:"many2many:user_chat"`
+	Messages []Message `json:"-" gorm:"foreignKey:UserID"`
+	Chats    []Chat    `json:"-" gorm:"many2many:user_chat"`
 }
 
 type Chat struct {
 	ID   uint   `db:"id" json:"id,omitempty" gorm:"primaryKey"`
 	Name string `db:"name" json:"name,omitempty" gorm:"not null;indexUnique"`
 
-	Messages []Message `gorm:"foreignKey:ChatID"`
-	Users    []User    `gorm:"many2many:user_chat"`
+	Users    []User    `json:"-" gorm:"many2many:user_chat"`
+	Messages []Message `json:"-" gorm:"foreignKey:ChatID"`
 }
 
 type Message struct {
@@ -32,7 +33,8 @@ type Message struct {
 	ChatID uint      `db:"chat_id" json:"chat_id"`
 	UserID uint      `db:"user_id" json:"author_id,omitempty"`
 
-	User *User `gorm:"foreignKey:ID"`
+	Chat *Chat `json:"-" gorm:"foreignKey:ChatID"`
+	User *User `json:"-" gorm:"foreignKey:UserID"`
 }
 
 func (User) TableName() string {

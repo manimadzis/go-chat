@@ -10,27 +10,26 @@ import (
 var logger = logging.Get()
 
 type userFields struct {
-	ID,
-	Login,
-	PasswordHash,
-	IsDeleted,
-	Chats string
+	ID           string
+	Login        string
+	PasswordHash string
+	IsDeleted    string
+
+	Messages string
+	Chats    string
 }
 
 type chatFields struct {
-	ID,
-	Name,
-	Messages,
-	Users string
+	ID   string
+	Name string
 }
 
 type messageFields struct {
-	ID,
-	Text,
-	Time,
-	ChatID,
-	UserID,
-	User string
+	ID     string
+	Text   string
+	Time   string
+	ChatID string
+	UserID string
 }
 
 var UserFields = initFieldStruct(User{}, userFields{})
