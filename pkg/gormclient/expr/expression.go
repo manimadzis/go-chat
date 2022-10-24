@@ -2,7 +2,7 @@ package expr
 
 import (
 	"fmt"
-	"go-chat/internal/chat/entities"
+	"go-chat/internal/entities"
 	"go-chat/pkg/logging"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

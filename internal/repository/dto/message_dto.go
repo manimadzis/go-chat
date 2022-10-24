@@ -1,6 +1,6 @@
-package message
+package dto
 
-import "go-chat/internal/chat/entities"
+import "go-chat/internal/entities"
 
 type CreateMessageDTO struct {
 	Text   string
