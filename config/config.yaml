@@ -4,3 +4,6 @@ db:
   username: "postgres"
   password: "pass"
   database: "chat"
+server:
+  host: "localhost"
+  port: "8978"

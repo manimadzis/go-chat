@@ -2,7 +2,7 @@ package expr
 
 import (
 	"fmt"
-	"go-chat/internal/entities"
+	"go-chat/internal/domain"
 	"go-chat/pkg/logging"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -101,8 +101,8 @@ func doubleQuoted(value string) string {
 }
 
 type joinQuery struct {
-	left  entities.Table
-	right entities.Table
+	left  domain.Table
+	right domain.Table
 
 	expression string
 	query      string
@@ -120,13 +120,13 @@ func (j *joinQuery) Eq(left, right string) string {
 	return j.query
 }
 
-func (j *joinQuery) To(left entities.Table) string {
+func (j *joinQuery) To(left domain.Table) string {
 	j.left = left
 	j.build()
 	return j.query
 }
 
-func columnWithAliasedTable(table entities.Table, column string) string {
+func columnWithAliasedTable(table domain.Table, column string) string {
 	return fmt.Sprintf("%s.%s", doubleQuoted(reflect.TypeOf(table).Name()), doubleQuoted(column))
 }
 
@@ -186,11 +186,11 @@ func typeName(t reflect.Type) string {
 	return t.Name()
 }
 
-func Join(table entities.Table) *joinQuery {
+func Join(table domain.Table) *joinQuery {
 	return &joinQuery{right: table}
 }
 
-func tableToAliasedTable(table entities.Table) string {
+func tableToAliasedTable(table domain.Table) string {
 	alias := reflect.TypeOf(table).Name()
 	return fmt.Sprintf("%s AS %s", doubleQuoted(table.TableName()), doubleQuoted(alias))
 }

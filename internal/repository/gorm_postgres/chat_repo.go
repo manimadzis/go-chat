@@ -3,9 +3,8 @@ package gorm_postgres
 import (
 	"context"
 	"github.com/lib/pq"
-	"go-chat/internal/entities"
+	"go-chat/internal/domain"
 	"go-chat/internal/repository"
-	"go-chat/internal/repository/dto"
 	"go-chat/pkg/logging"
 	"gorm.io/gorm"
 )
@@ -16,11 +15,11 @@ type chatRepo struct {
 }
 
 func (r *chatRepo) AutoMigrate(ctx context.Context) error {
-	return r.db.WithContext(ctx).AutoMigrate(&entities.Chat{})
+	return r.db.WithContext(ctx).AutoMigrate(&domain.Chat{})
 }
 
-func (r *chatRepo) Create(ctx context.Context, dto *dto.CreateChatDTO) (*entities.Chat, error) {
-	chat := entities.Chat{
+func (r *chatRepo) Create(ctx context.Context, dto *domain.CreateChatDTO) (*domain.Chat, error) {
+	chat := domain.Chat{
 		Name: dto.Name,
 	}
 	err := r.db.WithContext(ctx).Create(&chat).Error
@@ -30,8 +29,8 @@ func (r *chatRepo) Create(ctx context.Context, dto *dto.CreateChatDTO) (*entitie
 	return &chat, nil
 }
 
-func (r *chatRepo) Delete(ctx context.Context, dto *dto.DeleteChatDTO) error {
-	chat := entities.Chat{
+func (r *chatRepo) Delete(ctx context.Context, dto *domain.DeleteChatDTO) error {
+	chat := domain.Chat{
 		ID: dto.ID,
 	}
 	err := r.db.WithContext(ctx).Delete(&chat).Error
@@ -41,8 +40,8 @@ func (r *chatRepo) Delete(ctx context.Context, dto *dto.DeleteChatDTO) error {
 	return nil
 }
 
-func (r *chatRepo) FindByID(ctx context.Context, id uint) (*entities.Chat, error) {
-	chat := entities.Chat{
+func (r *chatRepo) FindByID(ctx context.Context, id uint) (*domain.Chat, error) {
+	chat := domain.Chat{
 		ID: id,
 	}
 	err := r.db.WithContext(ctx).Take(&chat).Error

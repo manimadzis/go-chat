@@ -1,6 +1,4 @@
-package dto
-
-import "go-chat/internal/entities"
+package domain
 
 type CreateMessageDTO struct {
 	Text   string
@@ -13,12 +11,12 @@ type DeleteMessageDTO struct {
 }
 
 type UpdateMessageDTO struct {
-	OldMessage *entities.Message
-	NewMessage *entities.Message
+	OldMessage *Message
+	NewMessage *Message
 }
 
-type FindByChatDTO struct {
-	Chat   *entities.Chat
+type FindMessageByChatDTO struct {
+	Chat   *Chat
 	Limit  int
 	Offset int
 }

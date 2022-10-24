@@ -1,4 +1,4 @@
-package entities
+package domain
 
 import (
 	"time"
@@ -19,9 +19,11 @@ type User struct {
 }
 
 type Chat struct {
-	ID   uint   `db:"id" json:"id,omitempty" gorm:"primaryKey"`
-	Name string `db:"name" json:"name,omitempty" gorm:"not null"`
+	ID      uint   `db:"id" json:"id,omitempty" gorm:"primaryKey"`
+	Name    string `db:"name" json:"name,omitempty" gorm:"not null"`
+	OwnerID uint   `db:"owner" gorm:"not null"`
 
+	Owner    *User     `json:"owner" gorm:"foreignKey:OwnerID"`
 	Users    []User    `json:"-" gorm:"many2many:user_chat"`
 	Messages []Message `json:"-" gorm:"foreignKey:ChatID"`
 }
