@@ -14,12 +14,12 @@ type storage struct {
 }
 
 func (s *storage) FindById(ctx context.Context, id uint) (*entities.User, error) {
-	u := &entities.User{}
-	if err := s.db.WithContext(ctx).First(&u).Error; err != nil {
-		//if pqErr, ok := err.(*pq.Error); ok {
-		//	pqErr.
-		//}
-		return nil, err
+	u := &entities.User{ID: id}
+	if err := s.db.WithContext(ctx).Take(&u).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, db.ErrUnknownUser
+		}
+		return nil, db.UnknownErr(err)
 	}
 
 	return u, nil
@@ -36,13 +36,11 @@ func (s *storage) Create(ctx context.Context, dto *user.CreateUserDTO) (*entitie
 
 	if err := s.db.WithContext(ctx).Create(user).Error; err != nil {
 		pqErr, ok := err.(*pq.Error)
-		if !ok {
-			return nil, db.ErrUnknown
-		}
-
-		if pqErr.Code.Name() == "unique_violation" {
+		if ok && pqErr.Code.Name() == "unique_violation" {
 			return nil, db.ErrDuplicatedLogin
 		}
+
+		return nil, db.UnknownErr(err)
 	}
 
 	return user, nil
