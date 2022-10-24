@@ -1,32 +1,35 @@
 package app
 
+import (
+	"context"
+	"go-chat/internal/config"
+	repository "go-chat/internal/repository/gorm_postgres"
+	dbclient "go-chat/pkg/dbclient/postgres"
+	"go-chat/pkg/gormclient"
+	"go-chat/pkg/logging"
+)
+
 func Run() {
-	//logger := logging.Get()
-	//
-	//dbConfig := dbclient.Config{
-	//	Host:     "localhost",
-	//	Port:     "5433",
-	//	Username: "postgres",
-	//	Password: "pass",
-	//	Database: "chat",
-	//}
+	logger := logging.Get()
 
-	//dbConn, err := dbclient.New(dbConfig)
-	//if err != nil {
-	//	logger.Panicf("Cannot connect to DB")
-	//}
-	//defer dbConn.Close()
-	//
-	//gormDB, err := gormclient.New(dbConn)
-	//if err != nil {
-	//	logger.Panicf("Cannot open GORM connection")
-	//}
-	//
-	//ctx := context.Background()
-	//repo := userDB.NewRepository(gormDB)
-	//err = repo.AutoMigrate(ctx)
-	//logger.Error(err)
+	conf, err := config.Load()
+	if err != nil {
+		logger.Panicf("Can't load config: %v", err)
+	}
 
-	//_, err = repo.Create(ctx, &user.CreateUserDTO{Login: "123", Password: "123"})
-	//logger.Error(err)
+	dbConn, err := dbclient.New(conf.DB)
+	if err != nil {
+		logger.Panicf("Cannot connect to DB")
+	}
+	defer dbConn.Close()
+
+	gormDB, err := gormclient.New(dbConn)
+	if err != nil {
+		logger.Panicf("Cannot open GORM connection")
+	}
+
+	ctx := context.Background()
+	repo := repository.New(gormDB, logger)
+	err = repo.UserRepo.AutoMigrate(ctx)
+	logger.Info(err)
 }

@@ -4,9 +4,6 @@ import (
 	"context"
 	"go-chat/internal/entities"
 	"go-chat/internal/repository/dto"
-	"go-chat/internal/repository/gorm_postgres"
-	"go-chat/pkg/logging"
-	"gorm.io/gorm"
 )
 
 type UserRepository interface {
@@ -33,15 +30,7 @@ type MessageRepository interface {
 }
 
 type Repository struct {
-	UserStorage    UserRepository
-	ChatStorage    ChatRepository
-	MessageStorage MessageRepository
-}
-
-func New(gormDB *gorm.DB, logger *logging.Logger) *Repository {
-	return &Repository{
-		UserStorage:    gorm_postgres.NewUserRepository(gormDB),
-		ChatStorage:    gorm_postgres.NewChatRepository(gormDB, logger),
-		MessageStorage: gorm_postgres.NewMessageRepository(gormDB, logger),
-	}
+	UserRepo    UserRepository
+	ChatRepo    ChatRepository
+	MessageRepo MessageRepository
 }
