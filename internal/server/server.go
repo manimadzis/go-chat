@@ -2,10 +2,12 @@ package server
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go-chat/internal/handler"
+	"github.com/julienschmidt/httprouter"
+	"go-chat/internal/handler/rest"
+	"go-chat/internal/service"
 	"go-chat/pkg/logging"
 	"net/http"
+	"time"
 )
 
 type Server interface {
@@ -13,27 +15,27 @@ type Server interface {
 }
 
 type server struct {
-	router *gin.Engine
-	logger *logging.Logger
-	config *Config
+	logger     *logging.Logger
+	config     *Config
+	service    *service.Service
+	httpServer *http.Server
 }
 
-func New(config *Config, logger *logging.Logger) Server {
-
-	s := &server{
-		router: gin.New(),
-		logger: logger,
-		config: config,
+func New(config *Config, service *service.Service, logger *logging.Logger) Server {
+	return &server{
+		logger:  logger,
+		service: service,
+		config:  config,
+		httpServer: &http.Server{
+			Addr:         fmt.Sprintf("%s:%s", config.Host, config.Port),
+			Handler:      rest.New(httprouter.New()),
+			ReadTimeout:  15 * time.Second,
+			WriteTimeout: 15 * time.Second,
+		},
 	}
-	handler.Handler{}.InitRouter(s.router)
-
-	return s
-}
-
-func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.router.ServeHTTP(w, r)
 }
 
 func (s *server) Start() error {
-	return http.ListenAndServe(fmt.Sprintf("%s:%s", s.config.Host, s.config.Post), s)
+	s.logger.Info("Starting server...")
+	return s.httpServer.ListenAndServe()
 }

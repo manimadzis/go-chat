@@ -3,13 +3,20 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"go-chat/internal/server"
-	"go-chat/pkg/dbclient/postgres"
 )
 
 type Config struct {
-	DB     *postgres.Config `mapstructure:"db"`
-	Server *server.Config   `mapstructure:"server"`
+	DB struct {
+		Host     string `mapstructure:"host"`
+		Port     string `mapstructure:"port"`
+		Username string `mapstructure:"username"`
+		Password string `mapstructure:"password"`
+		Database string `mapstructure:"database"`
+	} `mapstructure:"db"`
+	Server struct {
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
+	} `mapstructure:"server"`
 }
 
 func Load() (*Config, error) {
@@ -27,12 +34,6 @@ func Load() (*Config, error) {
 	err = viper.Unmarshal(&config)
 	if err != nil {
 		return nil, fmt.Errorf("can't unmarshal config: %v", err)
-	}
-	if config.Server == nil {
-		return nil, fmt.Errorf("no server config")
-	}
-	if config.DB == nil {
-		return nil, fmt.Errorf("no DB config")
 	}
 
 	return &config, nil

@@ -7,19 +7,22 @@ import (
 	"go-chat/pkg/logging"
 )
 
-type UserService struct {
+type UserService interface {
+}
+
+type userService struct {
 	repo   *repository.Repository
 	logger *logging.Logger
 }
 
-func NewUserService(repo *repository.Repository, logger *logging.Logger) *UserService {
-	return &UserService{
+func NewUserService(repo *repository.Repository, logger *logging.Logger) UserService {
+	return &userService{
 		repo:   repo,
 		logger: logger,
 	}
 }
 
-func (u *UserService) SingUp(ctx context.Context, dto *domain.CreateUserDTO) error {
+func (u *userService) SingUp(ctx context.Context, dto *domain.CreateUserDTO) error {
 	u.logger.Tracef("Start to sign up new user: %v", dto)
 
 	_, err := u.repo.UserRepo.Create(ctx, dto)

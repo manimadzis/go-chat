@@ -1,38 +1,56 @@
 package app
 
 import (
-	"fmt"
 	"go-chat/internal/config"
+	repository "go-chat/internal/repository/gorm_postgres"
 	"go-chat/internal/server"
+	"go-chat/internal/service"
+	dbclient "go-chat/pkg/dbclient/postgres"
+	"go-chat/pkg/gormclient"
 	"go-chat/pkg/logging"
+	"log"
 )
 
 func Run() {
-	logger := logging.Get()
-
 	conf, err := config.Load()
 	if err != nil {
-		logger.Panicf("Can't load config: %v", err)
+		log.Panicf("Can't load config: %v", err)
 	}
+	log.Println("Load config")
 
-	fmt.Printf("%#v", conf)
-	//
-	//dbConn, err := dbclient.New(conf.DB)
-	//if err != nil {
-	//	logger.Panicf("Cannot connect to DB")
-	//}
-	//defer dbConn.Close()
-	//
-	//gormDB, err := gormclient.New(dbConn)
-	//if err != nil {
-	//	logger.Panicf("Cannot open GORM connection")
-	//}
-	//
-	//ctx := context.Background()
-	//repo := repository.New(gormDB, logger)
-	//err = repo.UserRepo.AutoMigrate(ctx)
-	//logger.Info(err)
+	logger := logging.Get()
+	if logger == nil {
+		log.Panicf("Can't create logger: %v", err)
+	}
+	log.Println("Init logger")
 
-	s := server.New(conf.Server, logging.Get())
-	s.Start()
+	logger.Info("Creating connection to DB...")
+	dbConn, err := dbclient.New(dbclient.Config{
+		Host:     conf.DB.Host,
+		Port:     conf.DB.Port,
+		Username: conf.DB.Username,
+		Password: conf.DB.Password,
+		Database: conf.DB.Database,
+	})
+	if err != nil {
+		logger.Panicf("Cannot connect to DB")
+	}
+	defer dbConn.Close()
+	logger.Info("Create connection to DB")
+
+	logger.Info("Opening gorm connection to gorm...")
+	gormDB, err := gormclient.New(dbConn)
+	if err != nil {
+		logger.Panicf("Cannot open GORM connection")
+	}
+	logger.Info("Open gorm connection")
+
+	repo := repository.New(gormDB, logger)
+
+	s := server.New(&server.Config{
+		Host: conf.Server.Host,
+		Port: conf.Server.Port,
+	}, service.New(repo, logger), logger)
+	logger.Info("Starting app...")
+	logger.Error(s.Start())
 }

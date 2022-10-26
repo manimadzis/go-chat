@@ -29,6 +29,8 @@ func init() {
 		FullTimestamp: true,
 	})
 
+	log.SetLevel(logrus.TraceLevel)
+
 	log.SetOutput(os.Stdout)
 
 	logger = logrus.NewEntry(log)
