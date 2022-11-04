@@ -9,10 +9,12 @@ type Table interface {
 }
 
 type User struct {
-	ID           uint   `db:"id" json:"id,omitempty" gorm:"primaryKey"`
-	Login        string `db:"login" json:"login,omitempty" gorm:"uniqueIndex;not null"`
-	PasswordHash string `db:"password_hash" json:"-" gorm:"not null"`
-	IsDeleted    bool   `db:"is_deleted" json:"-" gorm:"default:false"`
+	ID           uint      `db:"id" json:"id,omitempty" gorm:"primaryKey"`
+	Login        string    `db:"login" json:"login,omitempty" gorm:"uniqueIndex;not null"`
+	PasswordHash string    `db:"password_hash" json:"-" gorm:"not null"`
+	RefreshToken string    `db:"refresh_token" json:"refresh_token"`
+	ExpiredAt    time.Time `db:"expire_at" json:"expire_at" gorm:"type:timestamp"`
+	IsDeleted    bool      `db:"is_deleted" json:"-" gorm:"default:false"`
 
 	Messages []Message `json:"-" gorm:"foreignKey:UserID"`
 	Chats    []Chat    `json:"-" gorm:"many2many:user_chat"`

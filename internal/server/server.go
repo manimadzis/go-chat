@@ -28,7 +28,7 @@ func New(config *Config, service *service.Service, logger *logging.Logger) Serve
 		config:  config,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", config.Host, config.Port),
-			Handler:      rest.New(httprouter.New()),
+			Handler:      rest.New(httprouter.New(), service, logger),
 			ReadTimeout:  15 * time.Second,
 			WriteTimeout: 15 * time.Second,
 		},

@@ -7,8 +7,9 @@ func UnknownErr(err error) error {
 }
 
 var (
-	ErrUnknownChat     = fmt.Errorf("unknown chat")
-	ErrUnknownMessage  = fmt.Errorf("unknown message")
-	ErrDuplicatedLogin = fmt.Errorf("duplicate login")
-	ErrUnknownUser     = fmt.Errorf("unknown user")
+	ErrUnknownChat         = fmt.Errorf("unknown chat")
+	ErrUnknownMessage      = fmt.Errorf("unknown message")
+	ErrDuplicatedLogin     = fmt.Errorf("duplicate login")
+	ErrUnknownUser         = fmt.Errorf("unknown user")
+	ErrUnknownRefreshToken = fmt.Errorf("unknown refresh token")
 )

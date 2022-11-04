@@ -5,5 +5,15 @@ type DeleteChatDTO struct {
 }
 
 type CreateChatDTO struct {
-	Name string
+	Name    string `json:"name"`
+	OwnerID uint   `json:"owner_id"`
+}
+
+func (c *CreateChatDTO) Valid() error {
+	return nil
+}
+
+type UpdateChatDTO struct {
+	OldChat Chat
+	NewChat Chat
 }

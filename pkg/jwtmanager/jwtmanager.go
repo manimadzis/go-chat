@@ -9,9 +9,10 @@ import (
 )
 
 type JWTAuth struct {
-	JWT                   string
-	RefreshToken          string
-	RefreshTokenExpiredAt time.Time
+	JWT                   string    `json:"jwt"`
+	RefreshToken          string    `json:"refresh_tokenToken"`
+	JWTExpiredAt          time.Time `json:"jwt_expired_at"`
+	RefreshTokenExpiredAt time.Time `json:"refresh_token_expired_at"`
 }
 
 type Config struct {
@@ -22,17 +23,29 @@ type Config struct {
 }
 
 type JWTManager interface {
-	NewJWT(userId string) (string, error)
-	NewRefreshToken() string
+	NewRefreshToken() (string, time.Time)
 	NewJWTAuth(userId string) (*JWTAuth, error)
+	RefreshJWT(userId string, refreshToken string) (*JWTAuth, error)
 	Parse(token string) (string, error)
 }
-
 type jwtManager struct {
 	signKey            string
 	refreshTokenLength int
 	JWTTTL             time.Duration
 	refreshTokenTTL    time.Duration
+}
+
+func (j jwtManager) RefreshJWT(userId string, refreshToken string) (*JWTAuth, error) {
+	var err error
+	auth := JWTAuth{
+		RefreshToken: refreshToken,
+	}
+	auth.JWT, err = j.newJWT(userId, j.JWTTTL)
+	if err != nil {
+		return nil, err
+	}
+	auth.JWTExpiredAt = time.Now().Add(j.JWTTTL)
+	return &auth, nil
 }
 
 func (j jwtManager) newJWT(userId string, duration time.Duration) (string, error) {
@@ -71,15 +84,6 @@ func (j jwtManager) parse(token string) (string, error) {
 	return claims.Subject, nil
 }
 
-func (j jwtManager) NewJWT(userId string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Subject:   userId,
-		ExpiresAt: time.Now().Add(j.JWTTTL).Unix(),
-	})
-
-	return token.SignedString([]byte(j.signKey))
-}
-
 func (j jwtManager) NewJWTAuth(userId string) (*JWTAuth, error) {
 	var err error
 	jwtToken := JWTAuth{}
@@ -92,11 +96,8 @@ func (j jwtManager) NewJWTAuth(userId string) (*JWTAuth, error) {
 	return &jwtToken, nil
 }
 
-func (j jwtManager) NewRefreshToken() string {
-	token := make([]byte, j.refreshTokenLength)
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	r.Read(token)
-	return base64.StdEncoding.EncodeToString(token)
+func (j jwtManager) NewRefreshToken() (string, time.Time) {
+	return j.newRefreshToken(), time.Now().Add(j.refreshTokenTTL)
 }
 
 func (j jwtManager) Parse(token string) (string, error) {

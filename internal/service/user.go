@@ -8,6 +8,7 @@ import (
 )
 
 type UserService interface {
+	SignUp(ctx context.Context, dto domain.CreateUserDTO) error
 }
 
 type userService struct {
@@ -22,8 +23,20 @@ func NewUserService(repo *repository.Repository, logger *logging.Logger) UserSer
 	}
 }
 
-func (u *userService) SingUp(ctx context.Context, dto *domain.CreateUserDTO) error {
+func (u *userService) SignUp(ctx context.Context, dto domain.CreateUserDTO) error {
 	u.logger.Tracef("Start to sign up new user: %v", dto)
+
+	_, err := u.repo.UserRepo.Create(ctx, dto)
+	if err != nil {
+		u.logger.Errorf("User creation is failed: %v", err)
+		return err
+	}
+	u.logger.Tracef("Successfully signed up new user: %v", dto)
+	return nil
+}
+
+func (u *userService) SignIn(ctx context.Context, dto domain.CreateUserDTO) error {
+	u.logger.Tracef("Start to sign in user: %v", dto)
 
 	_, err := u.repo.UserRepo.Create(ctx, dto)
 	if err != nil {

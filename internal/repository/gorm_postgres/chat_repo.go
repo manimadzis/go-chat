@@ -18,9 +18,10 @@ func (r *chatRepo) AutoMigrate(ctx context.Context) error {
 	return r.db.WithContext(ctx).AutoMigrate(&domain.Chat{})
 }
 
-func (r *chatRepo) Create(ctx context.Context, dto *domain.CreateChatDTO) (*domain.Chat, error) {
+func (r *chatRepo) Create(ctx context.Context, dto domain.CreateChatDTO) (*domain.Chat, error) {
 	chat := domain.Chat{
-		Name: dto.Name,
+		Name:    dto.Name,
+		OwnerID: dto.OwnerID,
 	}
 	err := r.db.WithContext(ctx).Create(&chat).Error
 	if err != nil {
@@ -29,7 +30,11 @@ func (r *chatRepo) Create(ctx context.Context, dto *domain.CreateChatDTO) (*doma
 	return &chat, nil
 }
 
-func (r *chatRepo) Delete(ctx context.Context, dto *domain.DeleteChatDTO) error {
+func (r *chatRepo) Update(ctx context.Context, dto domain.UpdateChatDTO) error {
+	return r.db.WithContext(ctx).Model(dto.OldChat).Updates(dto.NewChat).Error
+}
+
+func (r *chatRepo) Delete(ctx context.Context, dto domain.DeleteChatDTO) error {
 	chat := domain.Chat{
 		ID: dto.ID,
 	}

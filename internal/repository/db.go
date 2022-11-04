@@ -1,7 +1,8 @@
-package domain
+package repository
 
 import (
 	"fmt"
+	"go-chat/internal/domain"
 	"go-chat/pkg/logging"
 	"reflect"
 	"strings"
@@ -32,15 +33,15 @@ type messageFields struct {
 	UserID string
 }
 
-var UserFields = initFieldStruct(User{}, userFields{})
-var ChatFields = initFieldStruct(Chat{}, chatFields{})
-var MessageFields = initFieldStruct(Message{}, messageFields{})
+var UserFields = initFieldStruct(domain.User{}, userFields{})
+var ChatFields = initFieldStruct(domain.Chat{}, chatFields{})
+var MessageFields = initFieldStruct(domain.Message{}, messageFields{})
 
 type structConstraint interface {
 	userFields | chatFields | messageFields
 }
 
-func dbFieldName(table Table, fieldName string) string {
+func dbFieldName(table domain.Table, fieldName string) string {
 	t := reflect.TypeOf(table)
 	field, ok := t.FieldByName(fieldName)
 	if !ok {
@@ -58,7 +59,7 @@ func dbFieldName(table Table, fieldName string) string {
 	return fmt.Sprintf("\"%s\".\"%s\"", table.TableName(), fieldName)
 }
 
-func initFieldStruct[T structConstraint](table Table, fields T) *T {
+func initFieldStruct[T structConstraint](table domain.Table, fields T) *T {
 	v := reflect.ValueOf(&fields)
 	t := reflect.TypeOf(fields)
 

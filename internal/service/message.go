@@ -22,7 +22,7 @@ func NewMessageService(repo *repository.Repository, logger *logging.Logger) Mess
 	}
 }
 
-func (m *messageService) Send(ctx context.Context, dto *domain.CreateMessageDTO) error {
+func (m *messageService) Create(ctx context.Context, dto domain.CreateMessageDTO) error {
 	m.logger.Tracef("Started creating the message: %v", dto)
 	_, err := m.repo.MessageRepo.Create(ctx, dto)
 	if err != nil {
@@ -33,7 +33,7 @@ func (m *messageService) Send(ctx context.Context, dto *domain.CreateMessageDTO)
 	return nil
 }
 
-func (m *messageService) FindByChat(ctx context.Context, dto *domain.FindMessageByChatDTO) ([]domain.Message, error) {
+func (m *messageService) FindByChat(ctx context.Context, dto domain.FindMessageByChatDTO) ([]domain.Message, error) {
 	m.logger.Tracef("Started looking for messages: %v", dto)
 	messages, err := m.repo.MessageRepo.FindByChat(ctx, dto)
 	if err != nil {

@@ -2,11 +2,15 @@ package rest
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"go-chat/internal/service"
+	"go-chat/pkg/logging"
 	"net/http"
 )
 
 type handler struct {
-	router *httprouter.Router
+	router  *httprouter.Router
+	service *service.Service
+	logger  *logging.Logger
 }
 
 func (h *handler) initRouter() {
@@ -30,8 +34,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.router.ServeHTTP(w, r)
 }
 
-func New(router *httprouter.Router) http.Handler {
-	h := handler{router: router}
+func New(router *httprouter.Router, service *service.Service, logger *logging.Logger) http.Handler {
+	h := handler{router: router, logger: logger}
 	h.initRouter()
 	return &h
 }
